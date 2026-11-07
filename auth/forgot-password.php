@@ -1,0 +1,5 @@
+<?php
+require_once __DIR__.'/../config/app.php';$message='';
+if($_SERVER['REQUEST_METHOD']==='POST'){verify_csrf();$email=trim($_POST['email']??'');$s=$pdo->prepare('SELECT id FROM users WHERE email=?');$s->execute([$email]);$u=$s->fetch();if($u){$token=bin2hex(random_bytes(32));$hash=hash('sha256',$token);$pdo->prepare('INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES(?,?,DATE_ADD(NOW(), INTERVAL 1 HOUR))')->execute([$u['id'],$hash]);$message='Demo reset token created. For production, connect an email provider. Token: '.$token;}else{$message='If the account exists, reset instructions will be sent.';}}
+$pageTitle='Forgot password';include __DIR__.'/../includes/header.php';include __DIR__.'/../includes/navbar.php';?>
+<main class="container auth-wrap"><form class="form-card" method="post"><h1>RESET PASSWORD.</h1><?= csrf_field() ?><p>Enter your registered email address.</p><label>Email<input type="email" name="email" required></label><button class="btn btn-dark btn-full">Request reset</button><?php if($message): ?><p class="success"><?= e($message) ?></p><?php endif; ?></form></main><?php include __DIR__.'/../includes/footer.php'; ?>

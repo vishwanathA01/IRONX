@@ -1,0 +1,8 @@
+<?php
+require_once __DIR__.'/../config/app.php';
+require_role('trainer');
+$pageTitle='Diet builder';
+include __DIR__.'/../includes/header.php';
+?>
+<div class="dashboard-layout"><?php include __DIR__.'/../includes/sidebar.php'; ?><main class="dashboard-main"><div class="dash-top"><div><span class="eyebrow">IRONX WORKSPACE</span><h1><?= e($pageTitle) ?></h1></div><span class="user-pill"><?= e(current_user()['name']) ?></span></div>
+<?php $msg='';if($_SERVER['REQUEST_METHOD']==='POST'){verify_csrf();$s=$pdo->prepare("INSERT INTO diet_plans(member_id,trainer_id,title,notes) VALUES(?,?,?,?)");$s->execute([(int)$_POST['member_id'],current_user()['id'],trim($_POST['title']),trim($_POST['notes'])]);$msg='Diet plan saved.';} ?><section class="panel"><h2>Create diet plan</h2><?php if($msg): ?><p class="success"><?= e($msg) ?></p><?php endif; ?><form method="post" class="form-grid"><?= csrf_field() ?><label>Member<select name="member_id" required><?php foreach($pdo->query("SELECT id,name FROM users WHERE role='member' AND status='active'") as $m): ?><option value="<?= (int)$m['id'] ?>"><?= e($m['name']) ?></option><?php endforeach; ?></select></label><label>Plan title<input name="title" required></label><label class="span-2">Notes<textarea name="notes" rows="5"></textarea></label><button class="btn btn-dark">Save diet plan</button></form></section></main></div><script src="<?= BASE_URL ?>/assets/js/main.js"></script></body></html>

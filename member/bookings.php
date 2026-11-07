@@ -1,0 +1,8 @@
+<?php
+require_once __DIR__.'/../config/app.php';
+require_role('member');
+$pageTitle='My bookings';
+include __DIR__.'/../includes/header.php';
+?>
+<div class="dashboard-layout"><?php include __DIR__.'/../includes/sidebar.php'; ?><main class="dashboard-main"><div class="dash-top"><div><span class="eyebrow">IRONX WORKSPACE</span><h1><?= e($pageTitle) ?></h1></div><span class="user-pill"><?= e(current_user()['name']) ?></span></div>
+<?php $msg='';if($_SERVER['REQUEST_METHOD']==='POST'){verify_csrf();$pdo->prepare("INSERT INTO bookings(member_id,trainer_id,session_date,notes) VALUES(?,NULL,?,?)")->execute([current_user()['id'],$_POST['session_date'],trim($_POST['notes'])]);$msg='Booking request submitted.';} ?><section class="panel"><h2>Request a session</h2><?php if($msg): ?><p class="success"><?= e($msg) ?></p><?php endif; ?><form method="post" class="form-grid"><?= csrf_field() ?><label>Preferred date and time<input type="datetime-local" name="session_date" required min="<?= date('Y-m-d\TH:i') ?>"></label><label>Notes<input name="notes" placeholder="Training goal or preferred session"></label><button class="btn btn-dark">Request booking</button></form></section><section class="panel"><h2>Your booking requests</h2><?php $s=$pdo->prepare('SELECT * FROM bookings WHERE member_id=? ORDER BY session_date DESC');$s->execute([current_user()['id']]);foreach($s as $r): ?><p><?= e($r['session_date']) ?> — <?= e($r['status']) ?></p><?php endforeach; ?></section></main></div><script src="<?= BASE_URL ?>/assets/js/main.js"></script></body></html>

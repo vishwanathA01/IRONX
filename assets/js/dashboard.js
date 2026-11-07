@@ -1,0 +1,1 @@
+// Dashboard-specific enhancements can be added here. Chart.js can be integrated when reporting data is available.
